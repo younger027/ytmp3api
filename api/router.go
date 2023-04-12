@@ -8,7 +8,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"os/exec"
-	"strings"
 	"time"
 	"ytmp3api/covert"
 )
@@ -42,12 +41,13 @@ func Convert(ctx *gin.Context) {
 		return
 	}
 
+	//64kbps-128kbps-256kbps-320kbps
 	quality := ctx.Query("quality")
 	if quality == "" {
 		quality = "128k"
 	}
 
-	filePath := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/" + strings.Split(ytURL, "v=")[1] + "-" + quality
+	filePath := fmt.Sprintf("/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/%s-%s", videoID, quality)
 	//yt-dlp --extract-audio --audio-format mp3 --audio-quality 320k https://www.youtube.com/watch\?v\=YudHcBIxlYw -o /Users/rockey-lyy/ad-tencent/320kid.mp3
 	cmdArray := []string{"--extract-audio", "--audio-format", "mp3", "--audio-quality", quality, ytURL, "-o", filePath}
 	cmd := exec.CommandContext(c, "yt-dlp", cmdArray...)
