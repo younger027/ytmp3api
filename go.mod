@@ -5,6 +5,8 @@ go 1.18
 require (
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.0
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
+	github.com/jinzhu/copier v0.3.5
 	github.com/prometheus/client_golang v1.14.0
 )
 
