@@ -1,17 +1,28 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 )
 
 func TestCacheLogic(t *testing.T) {
+	wg := &sync.WaitGroup{}
 	manager := InitLocalCacheObject(20, 3)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	wg.Add(1)
+	go func() {
+		manager.DropDelFile(ctx)
+		wg.Done()
+	}()
+
 	path := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/"
-	fileLen := 100
+	fileLen := 123
 	//create file
 	for i := 0; i < fileLen; i++ {
 		fileName := path + "filename_" + strconv.Itoa(i)
@@ -27,8 +38,14 @@ func TestCacheLogic(t *testing.T) {
 		//fmt.Println("add op:", fileName)
 		//time.Sleep(100 * time.Millisecond)
 	}
+
+	time.Sleep(5 * time.Second)
+	fmt.Println("manager.Clear():")
 	manager.Clear()
 
+	time.Sleep(5 * time.Second)
 	fmt.Println("exec end")
-	time.Sleep(100 * time.Second)
+	cancel()
+	wg.Wait()
+
 }

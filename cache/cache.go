@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"github.com/golang/groupcache/lru"
 	"github.com/jinzhu/copier"
@@ -32,26 +33,9 @@ func InitLocalCacheObject(MaxEntry, interval int) *LocalCacheManager {
 				return
 			}
 
+			manager.lock.Lock()
 			manager.trash = append(manager.trash, fileName)
-
-			now := time.Now().Unix()
-			if len(manager.trash) > manager.maxEntry/2 || now-manager.timestamp > manager.interval {
-				delFileArray := make([]string, 0, manager.maxEntry)
-
-				//加锁，copy数组 解锁
-				manager.lock.Lock()
-				copier.Copy(&delFileArray, &manager.trash)
-				manager.trash = manager.trash[0:0]
-				manager.timestamp = now
-				manager.lock.Unlock()
-				fmt.Println("start delFileArray operation, ", len(delFileArray))
-
-				go func() {
-					//del array file
-					convert.DelTrashFile(delFileArray)
-				}()
-			}
-
+			manager.lock.Unlock()
 		}
 
 		cache.OnEvicted = OnEvicted
@@ -72,23 +56,43 @@ func GetCacheManger() *LocalCacheManager {
 	return manager
 }
 
-func (m *LocalCacheManager) DropDelFile() {
-	////定时，定速将需要删除的文件写给job
-	//timer := time.NewTimer(1 * time.Second)
-	//for {
-	//	select {
-	//	case <-conn:
-	//		if timer.Stop() {
-	//			fmt.Println("timer.Stop()")
-	//		}
-	//	case <-timer.C: // timer 通道超时
-	//		fmt.Println("timer Channel timeout!")
-	//		timer.Reset(time.Duration(m.interval) * time.Second)
-	//	}
-	//
-	//}
-	//
-	//timer.Stop()
+func (m *LocalCacheManager) DropDelFile(ctx context.Context) {
+	//定时，定速将需要删除的文件写给job
+	timer := time.NewTimer(2 * time.Second)
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("Done...........")
+			return
+		case <-timer.C:
+			fmt.Println("timer Channel timeout!")
+
+			now := time.Now().Unix()
+			if len(manager.trash) >= manager.maxEntry/2 || now-manager.timestamp > manager.interval {
+				delFileArray := make([]string, 0, manager.maxEntry)
+
+				//加锁，copy数组 解锁
+				manager.lock.Lock()
+				copier.Copy(&delFileArray, &manager.trash)
+				manager.trash = manager.trash[0:0]
+				manager.lock.Unlock()
+
+				manager.timestamp = now
+
+				fmt.Println("start delFileArray operation, ", len(delFileArray))
+
+				go func() {
+					//del array file
+					convert.DelTrashFile(delFileArray)
+				}()
+			}
+
+			timer.Reset(time.Duration(m.interval) * time.Second)
+		}
+
+	}
+
+	timer.Stop()
 }
 
 func (m *LocalCacheManager) Add(key, value interface{}) {
