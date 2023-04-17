@@ -53,7 +53,7 @@ func Convert(ctx *gin.Context) {
 	}
 
 	directory := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/"
-	fileName := fmt.Sprintf("%s-%s", videoID, quality)
+	fileName := fmt.Sprintf("http://154.82.111.99/%s-%s", videoID, quality)
 	filePath := directory + fileName
 
 	//缓存检查，确保缓存中的文件路径和目录下的一致

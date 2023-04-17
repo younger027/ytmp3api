@@ -22,8 +22,6 @@ func main() {
 
 	go api.RunGinServer()
 
-	cache.GetCacheManger().Add("fileName", "1")
-
 	select {
 	case s := <-c:
 		fmt.Println("Got signal:", s)
