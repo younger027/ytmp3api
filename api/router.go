@@ -53,13 +53,14 @@ func Convert(ctx *gin.Context) {
 	}
 
 	directory := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/"
-	fileName := fmt.Sprintf("http://154.82.111.99/%s-%s", videoID, quality)
+	fileName := fmt.Sprintf("%s-%s", videoID, quality)
+	downLoadName := "http://154.82.111.99/" + fileName
 	filePath := directory + fileName
 
 	//缓存检查，确保缓存中的文件路径和目录下的一致
 	_, ok := cache.GetCacheManger().Get(fileName)
 	if ok {
-		resp.Path = fileName
+		resp.Path = downLoadName
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -100,7 +101,7 @@ func Convert(ctx *gin.Context) {
 	}
 
 	//TODO 增加host，返回完整路径
-	resp.Path = fileName
+	resp.Path = downLoadName
 	ctx.JSON(http.StatusOK, resp)
 
 	//fileName入缓存
