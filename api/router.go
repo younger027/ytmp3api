@@ -52,9 +52,10 @@ func Convert(ctx *gin.Context) {
 		quality = "128k"
 	}
 
-	directory := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/"
+	//directory := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/"
+	directory := "/root/ytmp3api/musicsource/download/"
 	fileName := fmt.Sprintf("%s-%s", videoID, quality)
-	downLoadName := "http://154.82.111.99/" + fileName
+	downLoadName := "http://154.82.111.99/" + fileName + ".mp3"
 	filePath := directory + fileName
 
 	//缓存检查，确保缓存中的文件路径和目录下的一致
