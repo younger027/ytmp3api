@@ -12,7 +12,7 @@ import (
 
 func TestCacheLogic(t *testing.T) {
 	wg := &sync.WaitGroup{}
-	manager := InitLocalCacheObject(20, 3)
+	manager := InitLocalCacheObject(20, 4)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	wg.Add(1)
@@ -22,7 +22,7 @@ func TestCacheLogic(t *testing.T) {
 	}()
 
 	path := "/Users/rockey-lyy/ad-tencent/ytmp3api/musicsource/"
-	fileLen := 123
+	fileLen := 12
 	//create file
 	for i := 0; i < fileLen; i++ {
 		fileName := path + "filename_" + strconv.Itoa(i)
